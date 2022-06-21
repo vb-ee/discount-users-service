@@ -1,0 +1,29 @@
+{
+    "name": "users-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start:build": "rimraf dist && tsc",
+        "dev:build": "tsc -w",
+        "dev:run": "nodemon dist/server.js",
+        "dev": "cross-env NODE_ENV=development concurrently npm:dev:*",
+        "start:run": "node dist/server.js",
+        "start": "cross-env NODE_ENV=production npm:start:*",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^18.0.0",
+        "cross-env": "^7.0.3",
+        "dotenv": "^16.0.1",
+        "rimraf": "^3.0.2",
+        "typescript": "^4.7.4"
+    },
+    "devDependencies": {
+        "concurrently": "^7.2.2",
+        "nodemon": "^2.0.16"
+    }
+}
