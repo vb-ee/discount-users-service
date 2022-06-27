@@ -1,5 +1,6 @@
 import express from 'express'
 
+// This is Singleton class for express router
 export class AppRouter {
     private static instance: express.Router
 
