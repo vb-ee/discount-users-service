@@ -10,10 +10,13 @@ export interface IRefreshToken {
 export const refreshTokenSchema = new Schema<IRefreshToken>(
     {
         userId: { type: Schema.Types.ObjectId, ref: 'User' },
-        token: String,
+        token: String
     },
     { timestamps: true }
 )
 
 // Create a Model.
-export const RefreshToken = model<IRefreshToken>('User', refreshTokenSchema)
+export const RefreshToken = model<IRefreshToken>(
+    'RefreshToken',
+    refreshTokenSchema
+)
