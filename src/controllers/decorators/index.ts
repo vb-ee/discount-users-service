@@ -1,2 +1,3 @@
 export * from './controller'
-export * from './userRoutes'
+export * from './routes'
+export * from './bodyValidator'
