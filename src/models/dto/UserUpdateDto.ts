@@ -15,6 +15,7 @@ export class UserUpdateDto {
     email: IUser['email']
 
     @IsNumberString()
+    @Expose()
     phone: IUser['phone']
 
     @IsString()

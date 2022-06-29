@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose'
-import { hashPassword } from '../utils'
+import { idText } from 'typescript'
+import { hashPassword, IJwtPayload, JwtUtils } from '../utils'
 
 // Create an interface representing a document in MongoDB.
 export interface IUser {
@@ -7,12 +8,13 @@ export interface IUser {
     phone: string
     password: string
     isAdmin: boolean
+    assignTokensToUserAndReturnThem(): { [key: string]: string }
 }
 
 // Create a Schema corresponding to the document interface.
 export const userSchema = new Schema<IUser>(
     {
-        email: { type: String, required: true, unique: true },
+        email: { type: String, unique: true, required: true },
         phone: { type: String, required: true, unique: true },
         password: { type: String, required: true, minlength: 6 },
         isAdmin: { type: Boolean, default: false }
@@ -20,7 +22,20 @@ export const userSchema = new Schema<IUser>(
     { timestamps: true }
 )
 
-userSchema.pre<IUser>('save', async function (next) {
+userSchema.methods.assignTokensToUserAndReturnThem = function () {
+    const jwtPayload: IJwtPayload = {
+        id: this._id,
+        phone: this.phone,
+        isAdmin: this.isAdmin
+    }
+
+    const accessToken = JwtUtils.generateAccessToken(jwtPayload)
+    const refreshToken = JwtUtils.generateAccessToken(jwtPayload)
+
+    return { accessToken, refreshToken }
+}
+
+userSchema.pre<IUser>('save', async function () {
     this.password = await hashPassword(this.password)
 })
 

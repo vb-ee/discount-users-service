@@ -4,7 +4,7 @@ import { accessEnv } from './accessEnvs'
 
 export interface IJwtPayload {
     id: Types.ObjectId
-    email: string
+    phone: string
     isAdmin: boolean
 }
 

@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express'
 @controller('/')
 class UserController {
     @get('users')
-    getUsers(req: Request, res: Response): void {
+    async getUsers(req: Request, res: Response) {
         res.send({ msg: 'Here should be users list' })
     }
 }

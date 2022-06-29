@@ -9,6 +9,7 @@ import {
 } from 'class-validator'
 import { IUser } from '../User'
 
+// Dto class for validation when the user created
 export class UserCreateDto {
     @IsDefined()
     @IsEmail()
@@ -28,5 +29,5 @@ export class UserCreateDto {
 
     @IsBoolean()
     @Expose()
-    isAdmin?: IUser['isAdmin']
+    isAdmin: IUser['isAdmin'] = false
 }

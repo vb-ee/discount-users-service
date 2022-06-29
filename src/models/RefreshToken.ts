@@ -12,7 +12,7 @@ export const refreshTokenSchema = new Schema<IRefreshToken>(
         userId: { type: Schema.Types.ObjectId, ref: 'User' },
         token: String
     },
-    { timestamps: true }
+    { timestamps: { createdAt: true, updatedAt: false } }
 )
 
 // Create a Model.

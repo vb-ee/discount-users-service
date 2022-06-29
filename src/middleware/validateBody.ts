@@ -1,6 +1,7 @@
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { NextFunction, RequestHandler, Request, Response } from 'express'
+import { isConstructorDeclaration } from 'typescript'
 
 // This is validation pipe for req.body object
 export const validateBody = (dtoClass: typeof Object): RequestHandler => {
@@ -11,7 +12,7 @@ export const validateBody = (dtoClass: typeof Object): RequestHandler => {
             return
         }
 
-        // Converting class to its object instance with properties in req.body
+        // Converting req.body to dtoClass constructor
         const bodyToValidate = plainToClass(dtoClass, req.body, {
             excludeExtraneousValues: true
         })
@@ -36,8 +37,8 @@ export const validateBody = (dtoClass: typeof Object): RequestHandler => {
                 // return error if any exists, with status code 400 as its bad request from client side
                 return next(res.status(400).send({ errors: errorKeys }))
             } else {
-                // Assign successfully validated bodt back to req.body object
-                req.body = bodyToValidate
+                // Assign successfully validated body back to req.body object
+                req.body = { ...bodyToValidate }
                 next()
             }
         })
