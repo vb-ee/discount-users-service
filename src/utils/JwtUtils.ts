@@ -23,10 +23,10 @@ export class JwtUtils {
     }
 
     static verifyAccessToken(accessToken: string) {
-        return jwt.verify(accessToken, this.accessSecret)
+        return jwt.verify(accessToken, this.accessSecret) as IJwtPayload
     }
 
     static verifyRefreshToken(refreshToken: string) {
-        return jwt.verify(refreshToken, this.refreshSecret)
+        return jwt.verify(refreshToken, this.refreshSecret) as IJwtPayload
     }
 }
