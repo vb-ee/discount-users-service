@@ -1,7 +1,6 @@
 import { plainToClass } from 'class-transformer'
 import { validate } from 'class-validator'
 import { NextFunction, RequestHandler, Request, Response } from 'express'
-import { isConstructorDeclaration } from 'typescript'
 
 // This is validation pipe for req.body object
 export const validateBody = (dtoClass: typeof Object): RequestHandler => {
