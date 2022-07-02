@@ -3,7 +3,7 @@ import { Schema, model, Types } from 'mongoose'
 // Create an interface representing a document in MongoDB.
 export interface IRefreshToken {
     userId: Types.ObjectId
-    token: string
+    token: string | null
 }
 
 // Create a Schema corresponding to the document interface.
