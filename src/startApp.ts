@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express, { Request, Response, NextFunction } from 'express'
+import express from 'express'
 import { AppRouter } from './utils'
 import { accessEnv } from './utils/accessEnvs'
 import './controllers'
@@ -9,8 +9,6 @@ import { errorHandler } from './middleware'
 const port = parseInt(accessEnv('PORT', '7070'), 10)
 
 export const startApp = () => {
-    // require('./controllers/UserController')
-
     const app = express()
 
     app.use(bodyParser.json())

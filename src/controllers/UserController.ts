@@ -1,10 +1,110 @@
-import { get, controller } from './decorators'
-import { Request, Response, NextFunction } from 'express'
+import {
+    get,
+    controller,
+    post,
+    bodyValidator,
+    put,
+    del,
+    paramsValidator
+} from './decorators'
+import { Request, Response } from 'express'
+import { User } from '../models'
+import { parseToNumber } from '../utils'
+import { UserCreateDto, UserUpdateDto } from '../models/dto'
 
 @controller('/')
 class UserController {
     @get('users')
     async getUsers(req: Request, res: Response) {
-        res.send({ msg: 'Here should be users list' })
+        const { page, limit } = req.query
+
+        if (!page || !limit)
+            return res.status(400).send({
+                msg: `${page ? "'page'" : "'limit'"} has to be defined`
+            })
+
+        const { parsedPage, parsedLimit } = parseToNumber(
+            <{ [key: string]: string }>req.query
+        )
+
+        const count = await User.countDocuments()
+
+        const users = await User.find()
+            .skip(parsedPage * parsedLimit)
+            .limit(parsedLimit)
+
+        res.status(200).json({ count, users })
+    }
+
+    @post('users')
+    @bodyValidator(UserCreateDto)
+    async createUser(req: Request, res: Response) {
+        const { phone } = req.body
+
+        const user = await User.findOne({ phone })
+        if (user)
+            return res.status(400).send({
+                msg: `User with phone number '${phone}' already exists`
+            })
+
+        await User.create(req.body)
+
+        res.status(201).send({ msg: 'User created successfully' })
+    }
+
+    @get('users/:usersId')
+    @paramsValidator(['userId'])
+    async getUser(req: Request, res: Response) {
+        const { userId } = req.params
+
+        if (!(await User.findById(userId)))
+            return res.status(404).send({
+                msg: `User with id '${userId}' not found`
+            })
+
+        const user = await User.findById(userId)
+
+        res.status(200).json({ user })
+    }
+
+    @put('users/:usersId')
+    @paramsValidator(['userId'])
+    @bodyValidator(UserUpdateDto)
+    async updateUser(req: Request, res: Response) {
+        const { userId } = req.params
+        const { phone, email, isAdmin, password } = req.body
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    phone,
+                    email,
+                    isAdmin,
+                    password
+                }
+            },
+            { new: true }
+        )
+        if (!user)
+            return res.status(404).send({
+                msg: `User with id '${userId}' not found`
+            })
+        res.status(204).end()
+    }
+
+    @del('users/:usersId')
+    @paramsValidator(['userId'])
+    @bodyValidator(UserUpdateDto)
+    async deleteUser(req: Request, res: Response) {
+        const { userId } = req.params
+
+        const user = await User.findByIdAndDelete(userId)
+        if (!user)
+            return res.status(404).send({
+                msg: `User with id '${userId}' not found`
+            })
+
+        res.status(204).end()
     }
 }

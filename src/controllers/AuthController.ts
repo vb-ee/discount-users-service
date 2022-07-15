@@ -16,7 +16,7 @@ class AuthController {
         if (user)
             return res
                 .status(400)
-                .send({ msg: `User with email '${phone}' already exists` })
+                .send({ msg: `User with phone '${phone}' already exists` })
 
         const newUser = await User.create({ email, password, phone, isAdmin })
 
