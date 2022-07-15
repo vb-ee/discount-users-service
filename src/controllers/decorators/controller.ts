@@ -1,4 +1,5 @@
 import 'reflect-metadata'
+import { validateParams } from '../../middleware'
 import { validateBody } from '../../middleware/validateBody'
 import { AppRouter, asyncWrapp } from '../../utils'
 import { MetadataKeys } from './MetadataKeys'
@@ -27,6 +28,12 @@ export function controller(prefix: string) {
                 key
             )
 
+            const paramsKeys = Reflect.getMetadata(
+                MetadataKeys.params,
+                target.prototype,
+                key
+            )
+
             const dtoClassToValidate = Reflect.getMetadata(
                 MetadataKeys.validator,
                 target.prototype,
@@ -37,6 +44,7 @@ export function controller(prefix: string) {
             if (path)
                 router[method](
                     `${prefix}${path}`,
+                    validateParams(paramsKeys),
                     validateBody(dtoClassToValidate),
                     routeHandler
                 )
