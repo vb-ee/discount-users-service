@@ -10,7 +10,7 @@ class AuthController {
     @post('signup')
     @bodyValidator(UserCreateDto)
     async signup(req: Request, res: Response) {
-        const { email, password, phone, isAdmin } = req.body
+        const { password, phone, isAdmin } = req.body
 
         const user = await User.findOne({ phone })
         if (user)
@@ -18,7 +18,7 @@ class AuthController {
                 .status(400)
                 .send({ msg: `User with phone '${phone}' already exists` })
 
-        const newUser = await User.create({ email, password, phone, isAdmin })
+        const newUser = await User.create({ password, phone, isAdmin })
 
         const { accessToken, refreshToken } =
             newUser.assignTokensToUserAndReturnThem()

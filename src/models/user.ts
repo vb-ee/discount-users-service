@@ -4,7 +4,6 @@ import { IRefreshToken, RefreshToken } from './RefreshToken'
 
 // Create an interface representing a document in MongoDB.
 export interface IUser {
-    email: string
     phone: string
     password: string
     isAdmin: boolean
@@ -28,7 +27,6 @@ type UserModel = Model<IUser, {}, IUserMethods>
 // Create a Schema corresponding to the document interfaces.
 export const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     {
-        email: { type: String, unique: true, required: true },
         phone: { type: String, required: true, unique: true },
         password: { type: String, required: true, minlength: 6 },
         isAdmin: { type: Boolean, default: false }
