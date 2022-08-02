@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { validateParams } from '../../middleware'
 import { validateBody } from '../../middleware/validateBody'
-import { AppRouter, asyncWrapp } from '../../utils'
+import { AppRouter, asyncWrapper } from '../../utils'
 import { MetadataKeys } from './MetadataKeys'
 import { Methods } from './Methods'
 
@@ -14,7 +14,7 @@ export function controller(prefix: string) {
         // Iterating over every function of controller class's object
         for (let key of Object.getOwnPropertyNames(target.prototype)) {
             // Assigning the class object's function to a variable
-            const routeHandler = asyncWrapp(target.prototype[key])
+            const routeHandler = asyncWrapper(target.prototype[key])
             // Getting metadata keys
             const path = Reflect.getMetadata(
                 MetadataKeys.path,
