@@ -34,7 +34,7 @@ export const validateBody = (dtoClass: typeof Object): RequestHandler => {
                 }
                 console.log(errorKeys)
                 // return error if any exists, with status code 400 as its bad request from client side
-                return next(res.status(400).send({ errors: errorKeys }))
+                next(res.status(400).send({ errors: errorKeys }))
             } else {
                 // Assign successfully validated body back to req.body object
                 req.body = { ...bodyToValidate }
