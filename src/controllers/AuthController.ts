@@ -1,5 +1,5 @@
-import { bodyValidator, controller, post } from './decorators'
-import { Request, Response, NextFunction } from 'express'
+import { bodyValidator, controller, post, get, del } from './decorators'
+import { Request, Response } from 'express'
 import { User } from '../models/User'
 import { RefreshToken } from '../models/RefreshToken'
 import { UserCreateDto } from '../models/dto'
@@ -25,7 +25,11 @@ class AuthController {
 
         await RefreshToken.create({ userId: newUser._id, token: refreshToken })
 
-        return res.status(201).send({ accessToken, refreshToken })
+        const userToSend = { _id: newUser._id, phone: newUser.phone }
+
+        return res
+            .status(201)
+            .send({ user: userToSend, accessToken, refreshToken })
     }
 
     @post('login')
@@ -58,14 +62,22 @@ class AuthController {
             refreshToken = savedRefreshToken.token
         }
 
-        return res.status(200).send({ accessToken, refreshToken })
+        const userToSend = {
+            _id: user._id,
+            phone: user.phone,
+            isAdmin: user.isAdmin
+        }
+
+        return res
+            .status(200)
+            .send({ user: userToSend, accessToken, refreshToken })
     }
-    @post('token')
+
+    @get('token')
     async token(req: Request, res: Response) {
         const { phone, isAdmin } = req.payload
 
-        const user = await User.findOne({ phone })
-
+        const user = await User.findOne({ phone }, { password: 0 })
         if (!user)
             return res.status(404).send({
                 msg: `User with phone number ${phone} is no longer available`
@@ -82,10 +94,11 @@ class AuthController {
             isAdmin
         })
 
-        res.status(200).send({ accessToken })
+        res.status(200).send({ user, accessToken })
     }
-    @post('logout')
-    async logout(req: Request, res: Response, next: NextFunction) {
+
+    @del('logout')
+    async logout(req: Request, res: Response) {
         const { phone } = req.payload
 
         const user = await User.findOne({ phone })
@@ -103,5 +116,18 @@ class AuthController {
         }
 
         return res.status(200).send({ msg: 'Successfully logged out' })
+    }
+
+    @get('user')
+    async user(req: Request, res: Response) {
+        const { phone } = req.payload
+
+        const user = await User.findOne({ phone }, { password: 0 })
+        if (!user)
+            return res.status(404).send({
+                msg: `User with phone number ${phone} is no longer available`
+            })
+
+        res.status(200).json(user)
     }
 }

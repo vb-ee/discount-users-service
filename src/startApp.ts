@@ -6,13 +6,14 @@ import { accessEnv } from './utils/accessEnvs'
 import './controllers'
 import { errorHandler } from './middleware'
 
-const port = parseInt(accessEnv('PORT', '7070'), 10)
+const port = parseInt(accessEnv('PORT', '7071'), 10)
 
 export const startApp = () => {
     const app = express()
 
-    app.use(bodyParser.json())
     app.use(cors())
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({ extended: true }))
 
     app.use(AppRouter.getInstance())
 
