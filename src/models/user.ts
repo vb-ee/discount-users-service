@@ -1,7 +1,8 @@
 import { Schema, model, Model, Document, Types } from 'mongoose'
-import { hashPassword, IJwtPayload, JwtUtils } from '../utils'
+import { accessEnv, hashPassword, IJwtPayload, JwtUtils } from '../utils'
 import { IRefreshToken, RefreshToken } from './RefreshToken'
 
+const profileServiceUri = accessEnv('PROFILE_SERVICE_URI')
 // Create an interface representing a document in MongoDB.
 export interface IUser {
     phone: string
@@ -27,7 +28,20 @@ type UserModel = Model<IUser, {}, IUserMethods>
 // Create a Schema corresponding to the document interfaces.
 export const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     {
-        phone: { type: String, required: true, unique: true },
+        phone: {
+            type: String,
+            required: true,
+            unique: true,
+            minlength: 8,
+            maxlength: 8,
+            validate: {
+                validator: function (value: string) {
+                    return /^[6]/i.test(value)
+                },
+                message: (props) =>
+                    `${props.value} is not a valid phone number!`
+            }
+        },
         password: { type: String, required: true, minlength: 6 },
         isAdmin: { type: Boolean, default: false }
     },

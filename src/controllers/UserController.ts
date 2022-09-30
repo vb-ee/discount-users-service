@@ -12,15 +12,15 @@ import { User } from '../models'
 import { parseToNumber } from '../utils'
 import { UserCreateDto, UserUpdateDto } from '../models/dto'
 
-@controller('/')
+@controller('users')
 class UserController {
-    @get('users')
+    @get('/')
     async getUsers(req: Request, res: Response) {
         const { page, limit } = req.query
 
         if (!page || !limit)
             return res.status(400).send({
-                msg: `${page ? "'page'" : "'limit'"} has to be defined`
+                errors: `${page ? "'page'" : "'limit'"} has to be defined`
             })
 
         const { parsedPage, parsedLimit } = parseToNumber(
@@ -36,7 +36,7 @@ class UserController {
         res.status(200).json({ count, users })
     }
 
-    @post('users')
+    @post('/')
     @bodyValidator(UserCreateDto)
     async createUser(req: Request, res: Response) {
         const { phone } = req.body
@@ -44,7 +44,7 @@ class UserController {
         const user = await User.findOne({ phone })
         if (user)
             return res.status(400).send({
-                msg: `User with phone number '${phone}' already exists`
+                errors: `User with phone number '${phone}' already exists`
             })
 
         await User.create(req.body)
@@ -52,14 +52,14 @@ class UserController {
         res.status(201).send({ msg: 'User created successfully' })
     }
 
-    @get('users/:usersId')
+    @get('/:userId')
     @paramsValidator(['userId'])
     async getUser(req: Request, res: Response) {
         const { userId } = req.params
 
         if (!(await User.findById(userId)))
             return res.status(404).send({
-                msg: `User with id '${userId}' not found`
+                errors: `User with id '${userId}' not found`
             })
 
         const user = await User.findById(userId)
@@ -67,7 +67,7 @@ class UserController {
         res.status(200).json({ user })
     }
 
-    @put('users/:usersId')
+    @put('/:userId')
     @paramsValidator(['userId'])
     @bodyValidator(UserUpdateDto)
     async updateUser(req: Request, res: Response) {
@@ -88,21 +88,20 @@ class UserController {
         )
         if (!user)
             return res.status(404).send({
-                msg: `User with id '${userId}' not found`
+                errors: `User with id '${userId}' not found`
             })
         res.status(204).end()
     }
 
-    @del('users/:usersId')
+    @del('/:userId')
     @paramsValidator(['userId'])
-    @bodyValidator(UserUpdateDto)
     async deleteUser(req: Request, res: Response) {
         const { userId } = req.params
 
         const user = await User.findByIdAndDelete(userId)
         if (!user)
             return res.status(404).send({
-                msg: `User with id '${userId}' not found`
+                errors: `User with id '${userId}' not found`
             })
 
         res.status(204).end()

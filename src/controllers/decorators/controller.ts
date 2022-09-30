@@ -43,7 +43,7 @@ export function controller(prefix: string) {
             // If function has path metadata key execute the routeHandler
             if (path)
                 router[method](
-                    `${prefix}${path}`,
+                    `/${prefix}${path}`,
                     validateParams(paramsKeys),
                     validateBody(dtoClassToValidate),
                     routeHandler

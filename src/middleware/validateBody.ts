@@ -3,11 +3,11 @@ import { validate } from 'class-validator'
 import { NextFunction, RequestHandler, Request, Response } from 'express'
 
 // This is validation pipe for req.body object
-export const validateBody = (dtoClass: typeof Object): RequestHandler => {
+export const validateBody = (dtoClass: any): RequestHandler => {
     return function (req: Request, res: Response, next: NextFunction) {
         // Check if body exists
         if (!req.body) {
-            res.status(422).send({ msg: 'Invalid Request' })
+            res.status(422).send({ errors: 'Invalid Request' })
             return
         }
 

@@ -1,12 +1,10 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import express from 'express'
-import { AppRouter } from './utils'
-import { accessEnv } from './utils/accessEnvs'
-import './controllers'
+import { AppRouter, accessEnv } from './utils'
 import { errorHandler } from './middleware'
 
-const port = parseInt(accessEnv('PORT', '7071'), 10)
+const port = parseInt(accessEnv('PORT', '8080'), 10)
 
 export const startApp = () => {
     const app = express()

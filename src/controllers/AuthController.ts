@@ -5,7 +5,7 @@ import { RefreshToken } from '../models/RefreshToken'
 import { UserCreateDto } from '../models/dto'
 import { comparePasswords, IJwtPayload, JwtUtils } from '../utils'
 
-@controller('/')
+@controller('')
 class AuthController {
     @post('signup')
     @bodyValidator(UserCreateDto)
@@ -16,7 +16,7 @@ class AuthController {
         if (user)
             return res
                 .status(400)
-                .send({ msg: `User with phone '${phone}' already exists` })
+                .send({ errors: `User with phone '${phone}' already exists` })
 
         const newUser = await User.create({ password, phone, isAdmin })
 
@@ -25,7 +25,11 @@ class AuthController {
 
         await RefreshToken.create({ userId: newUser._id, token: refreshToken })
 
-        const userToSend = { _id: newUser._id, phone: newUser.phone }
+        const userToSend = {
+            _id: newUser._id,
+            phone: newUser.phone,
+            isAdmin: newUser.isAdmin
+        }
 
         return res
             .status(201)
@@ -38,7 +42,7 @@ class AuthController {
 
         const user = await User.findOne({ phone })
         if (!user || !comparePasswords(password, user.password))
-            return res.status(401).send({ msg: `Invalid Credentials` })
+            return res.status(401).send({ errors: `Invalid Credentials` })
 
         const jwtPayload: IJwtPayload = { id: user._id, phone, isAdmin }
         const accessToken = JwtUtils.generateAccessToken(jwtPayload)
@@ -80,13 +84,13 @@ class AuthController {
         const user = await User.findOne({ phone }, { password: 0 })
         if (!user)
             return res.status(404).send({
-                msg: `User with phone number ${phone} is no longer available`
+                errors: `User with phone number ${phone} is no longer available`
             })
 
         const refreshToken = await user.getRefreshToken()
 
         if (!refreshToken || !refreshToken.token)
-            return res.status(401).send({ msg: 'Unauthorized' })
+            return res.status(401).send({ errors: 'Unauthorized' })
 
         const accessToken = JwtUtils.generateAccessToken({
             id: user._id,
@@ -105,7 +109,7 @@ class AuthController {
 
         if (!user)
             return res.status(404).send({
-                msg: `User with phone number ${phone} is no longer available`
+                errors: `User with phone number ${phone} is no longer available`
             })
 
         const refreshToken = await user.getRefreshToken()
@@ -116,18 +120,5 @@ class AuthController {
         }
 
         return res.status(200).send({ msg: 'Successfully logged out' })
-    }
-
-    @get('user')
-    async user(req: Request, res: Response) {
-        const { phone } = req.payload
-
-        const user = await User.findOne({ phone }, { password: 0 })
-        if (!user)
-            return res.status(404).send({
-                msg: `User with phone number ${phone} is no longer available`
-            })
-
-        res.status(200).json(user)
     }
 }
