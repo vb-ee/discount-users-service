@@ -90,7 +90,7 @@ class UserController {
             return res.status(404).send({
                 errors: `User with id '${userId}' not found`
             })
-        res.status(204).end()
+        res.status(204).json(user)
     }
 
     @del('/:userId')
