@@ -1,6 +1,6 @@
-import { bodyValidator, controller, post, get, del, put } from './decorators'
+import { bodyValidator, controller, get, del, put } from './decorators'
 import { Request, Response } from 'express'
-import { User } from '../models/User'
+import { User } from '../models'
 import { UserUpdateDto } from '../models/dto'
 
 @controller('')

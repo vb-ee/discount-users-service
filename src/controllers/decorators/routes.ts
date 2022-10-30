@@ -3,7 +3,7 @@ import 'reflect-metadata'
 import { MetadataKeys } from './MetadataKeys'
 import { Methods } from './Methods'
 
-interface RouteHandlerDescriptor extends PropertyDescriptor {
+export interface RouteHandlerDescriptor extends PropertyDescriptor {
     value?: RequestHandler
 }
 

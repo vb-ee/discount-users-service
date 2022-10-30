@@ -40,10 +40,18 @@ export function controller(prefix: string) {
                 key
             )
 
+            const middlewares =
+                Reflect.getMetadata(
+                    MetadataKeys.middleware,
+                    target.prototype,
+                    key
+                ) || []
+
             // If function has path metadata key execute the routeHandler
             if (path)
                 router[method](
                     `/${prefix}${path}`,
+                    ...middlewares,
                     validateParams(paramsKeys),
                     validateBody(dtoClassToValidate),
                     routeHandler
