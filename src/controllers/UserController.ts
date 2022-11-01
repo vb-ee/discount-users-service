@@ -12,12 +12,12 @@ import { Request, Response } from 'express'
 import { User } from '../models'
 import { parseToNumber } from '../utils'
 import { UserCreateDto, UserUpdateDto } from '../models/dto'
-import { restrictToAdmin } from '../middleware'
+import { restrictToAdmin, verifyToken } from '../middleware'
 
 @controller('users')
 class UserController {
     @get('/')
-    @use(restrictToAdmin())
+    @use([verifyToken(), restrictToAdmin()])
     async getUsers(req: Request, res: Response) {
         const { page, limit } = req.query
 
@@ -40,7 +40,7 @@ class UserController {
     }
 
     @post('/')
-    @use(restrictToAdmin())
+    @use([verifyToken(), restrictToAdmin()])
     @bodyValidator(UserCreateDto)
     async createUser(req: Request, res: Response) {
         const { phone } = req.body
@@ -57,7 +57,7 @@ class UserController {
     }
 
     @get('/:userId')
-    @use(restrictToAdmin())
+    @use([verifyToken(), restrictToAdmin()])
     @paramsValidator(['userId'])
     async getUser(req: Request, res: Response) {
         const { userId } = req.params
@@ -73,7 +73,7 @@ class UserController {
     }
 
     @put('/:userId')
-    @use(restrictToAdmin())
+    @use([verifyToken(), restrictToAdmin()])
     @paramsValidator(['userId'])
     @bodyValidator(UserUpdateDto)
     async updateUser(req: Request, res: Response) {
@@ -100,7 +100,7 @@ class UserController {
     }
 
     @del('/:userId')
-    @use(restrictToAdmin())
+    @use([verifyToken(), restrictToAdmin()])
     @paramsValidator(['userId'])
     async deleteUser(req: Request, res: Response) {
         const { userId } = req.params
