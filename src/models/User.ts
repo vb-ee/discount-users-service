@@ -1,8 +1,6 @@
 import { Schema, model, Model, Document, Types } from 'mongoose'
 import { accessEnv, hashPassword, IJwtPayload, JwtUtils } from '../utils'
 import { IRefreshToken, RefreshToken } from './RefreshToken'
-
-const profileServiceUri = accessEnv('PROFILE_SERVICE_URI')
 // Create an interface representing a document in MongoDB.
 export interface IUser {
     phone: string
@@ -57,7 +55,7 @@ userSchema.methods.assignTokensToUserAndReturnThem = function () {
     }
 
     const accessToken = JwtUtils.generateAccessToken(jwtPayload)
-    const refreshToken = JwtUtils.generateAccessToken(jwtPayload)
+    const refreshToken = JwtUtils.generateRefreshToken(jwtPayload)
 
     return { accessToken, refreshToken }
 }
