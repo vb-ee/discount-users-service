@@ -1,23 +1,30 @@
 import bodyParser from 'body-parser'
 import cors from 'cors'
-import express from 'express'
-import { AppRouter, accessEnv } from './utils'
+import { AppRouter } from './utils'
 import { errorHandler } from './middleware'
+import express, { Application } from 'express'
 
-const port = parseInt(accessEnv('PORT', '8080'), 10)
+export default class App {
+    app: Application
+    port: number
 
-export const startApp = () => {
-    const app = express()
+    constructor(port: number) {
+        this.port = port
+        this.app = express()
+        this.app.use(cors())
+        this.app.use(bodyParser.json())
+        this.app.use(bodyParser.urlencoded({ extended: true }))
+        this.app.use(AppRouter.getInstance())
+        this.app.use(errorHandler)
+    }
 
-    app.use(cors())
-    app.use(bodyParser.json())
-    app.use(bodyParser.urlencoded({ extended: true }))
+    getApp() {
+        return this.app
+    }
 
-    app.use(AppRouter.getInstance())
-
-    app.use(errorHandler)
-
-    app.listen(port, '0.0.0.0', () => {
-        console.info(`Users service listening on port ${port}`)
-    })
+    listen() {
+        this.app.listen(this.port, '0.0.0.0', () => {
+            console.info(`Users service listening on port ${this.port}`)
+        })
+    }
 }
