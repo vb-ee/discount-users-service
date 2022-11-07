@@ -1,8 +1,9 @@
-import { bodyValidator, controller, post, get, del } from './decorators'
+import { bodyValidator, controller, post, get, del, use } from './decorators'
 import { Request, Response } from 'express'
 import { User, RefreshToken } from '../models'
 import { UserCreateDto } from '../models/dto'
 import { comparePasswords, IJwtPayload, JwtUtils } from '../utils'
+import { verifyToken } from '../middleware'
 
 @controller('')
 class AuthController {
@@ -40,7 +41,7 @@ class AuthController {
         const { phone, password } = req.body
 
         const user = await User.findOne({ phone })
-        if (!user || !comparePasswords(password, user.password))
+        if (!user || !(await comparePasswords(password, user.password)))
             return res.status(401).send({ errors: `Invalid Credentials` })
 
         const jwtPayload: IJwtPayload = {
@@ -81,6 +82,7 @@ class AuthController {
     }
 
     @get('token')
+    @use([verifyToken(true)])
     async token(req: Request, res: Response) {
         const { phone, isAdmin } = req.payload
 
@@ -105,6 +107,7 @@ class AuthController {
     }
 
     @del('logout')
+    @use([verifyToken()])
     async logout(req: Request, res: Response) {
         const { phone } = req.payload
 
