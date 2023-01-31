@@ -1,6 +1,5 @@
 import { initConnection } from './db/connection'
-import 'dotenv/config'
-import { accessEnv } from './utils'
+import { accessEnv } from '@payhasly-discount/common'
 import './controllers'
 
 const port = parseInt(accessEnv('PORT', '8080'), 10)

@@ -15,6 +15,7 @@ export function controller(prefix: string) {
         for (let key of Object.getOwnPropertyNames(target.prototype)) {
             // Assigning the class object's function to a variable
             const routeHandler = asyncWrapper(target.prototype[key])
+            let validationMiddlewares = []
             // Getting metadata keys
             const path = Reflect.getMetadata(
                 MetadataKeys.path,
@@ -47,13 +48,18 @@ export function controller(prefix: string) {
                     key
                 ) || []
 
+            if (paramsKeys)
+                validationMiddlewares.push(validateParams(paramsKeys))
+            else if (dtoClassToValidate)
+                validationMiddlewares.push(validateBody(dtoClassToValidate))
+            else validationMiddlewares = []
+
             // If function has path metadata key execute the routeHandler
             if (path)
                 router[method](
                     `/${prefix}${path}`,
                     ...middlewares,
-                    validateParams(paramsKeys),
-                    validateBody(dtoClassToValidate),
+                    ...validationMiddlewares,
                     routeHandler
                 )
         }

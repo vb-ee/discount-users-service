@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt'
-import { accessEnv } from './accessEnvs'
+import { accessEnv } from '@payhasly-discount/common'
 
 export const hashPassword = async (password: string) => {
     return await bcrypt.hash(password, parseInt(accessEnv('SALT_ROUNDS')))

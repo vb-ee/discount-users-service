@@ -1,12 +1,5 @@
 import * as jwt from 'jsonwebtoken'
-import { Types } from 'mongoose'
-import { accessEnv } from './accessEnvs'
-
-export interface IJwtPayload {
-    id: Types.ObjectId
-    phone: string
-    isAdmin: boolean
-}
+import { accessEnv, IJwtPayload } from '@payhasly-discount/common'
 
 export class JwtUtils {
     private static accessSecret = accessEnv('JWT_ACCESS')
@@ -20,13 +13,5 @@ export class JwtUtils {
 
     static generateRefreshToken(payload: IJwtPayload) {
         return jwt.sign(payload, this.refreshSecret)
-    }
-
-    static verifyAccessToken(accessToken: string) {
-        return jwt.verify(accessToken, this.accessSecret) as IJwtPayload
-    }
-
-    static verifyRefreshToken(refreshToken: string) {
-        return jwt.verify(refreshToken, this.refreshSecret) as IJwtPayload
     }
 }

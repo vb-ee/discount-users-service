@@ -2,9 +2,8 @@ import { bodyValidator, controller, post, get, del, use } from './decorators'
 import { Request, Response } from 'express'
 import { User, RefreshToken } from '../models'
 import { UserCreateDto } from '../models/dto'
-import { comparePasswords, IJwtPayload, JwtUtils } from '../utils'
-import { verifyToken } from '../middleware'
-
+import { comparePasswords, JwtUtils } from '../utils'
+import { authHandler, IJwtPayload, Tokens } from '@payhasly-discount/common'
 @controller('')
 class AuthController {
     @post('signup')
@@ -25,15 +24,9 @@ class AuthController {
 
         await RefreshToken.create({ userId: newUser._id, token: refreshToken })
 
-        const userToSend = {
-            _id: newUser._id,
-            phone: newUser.phone,
-            isAdmin: newUser.isAdmin
-        }
-
         return res
             .status(201)
-            .send({ user: userToSend, accessToken, refreshToken })
+            .send({ user: newUser, accessToken, refreshToken })
     }
 
     @post('login')
@@ -45,7 +38,7 @@ class AuthController {
             return res.status(401).send({ errors: `Invalid Credentials` })
 
         const jwtPayload: IJwtPayload = {
-            id: user._id,
+            id: user._id.toString(),
             phone,
             isAdmin: user.isAdmin
         }
@@ -70,19 +63,11 @@ class AuthController {
             refreshToken = savedRefreshToken.token
         }
 
-        const userToSend = {
-            _id: user._id,
-            phone: user.phone,
-            isAdmin: user.isAdmin
-        }
-
-        return res
-            .status(200)
-            .send({ user: userToSend, accessToken, refreshToken })
+        return res.status(200).send({ user, accessToken, refreshToken })
     }
 
     @get('token')
-    @use([verifyToken(true)])
+    @use([authHandler(Tokens.refreshToken, 'JWT_REFRESH')])
     async token(req: Request, res: Response) {
         const { phone, isAdmin } = req.payload
 
@@ -98,7 +83,7 @@ class AuthController {
             return res.status(401).send({ errors: 'Unauthorized' })
 
         const accessToken = JwtUtils.generateAccessToken({
-            id: user._id,
+            id: user._id.toString(),
             phone,
             isAdmin
         })
@@ -107,7 +92,7 @@ class AuthController {
     }
 
     @del('logout')
-    @use([verifyToken()])
+    @use([authHandler(Tokens.accessToken, 'JWT_ACCESS')])
     async logout(req: Request, res: Response) {
         const { phone } = req.payload
 

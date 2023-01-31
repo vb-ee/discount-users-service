@@ -1,4 +1,4 @@
-import { plainToClass } from 'class-transformer'
+import { plainToInstance } from 'class-transformer'
 import { validate } from 'class-validator'
 import { NextFunction, RequestHandler, Request, Response } from 'express'
 
@@ -12,10 +12,10 @@ export const validateBody = (dtoClass: any): RequestHandler => {
         }
 
         // Converting req.body to dtoClass constructor
-        const bodyToValidate = plainToClass(dtoClass, req.body, {
+        const bodyToValidate = plainToInstance(dtoClass, req.body, {
             excludeExtraneousValues: true
         })
-
+        console.log(bodyToValidate)
         // validating
         validate(bodyToValidate, {
             forbidNonWhitelisted: true,

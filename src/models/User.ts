@@ -1,6 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose'
-import { accessEnv, hashPassword, IJwtPayload, JwtUtils } from '../utils'
+import { hashPassword, JwtUtils } from '../utils'
 import { IRefreshToken, RefreshToken } from './RefreshToken'
+import { IJwtPayload } from '@payhasly-discount/common'
 // Create an interface representing a document in MongoDB.
 export interface IUser {
     phone: string
@@ -43,7 +44,17 @@ export const userSchema = new Schema<IUser, UserModel, IUserMethods>(
         password: { type: String, required: true, minlength: 6 },
         isAdmin: { type: Boolean, default: false }
     },
-    { timestamps: true }
+    {
+        timestamps: true,
+        versionKey: false,
+        toJSON: {
+            transform(doc, ret) {
+                ret.id = ret._id
+                delete ret._id
+                delete ret.password
+            }
+        }
+    }
 )
 
 // Instance Methods
