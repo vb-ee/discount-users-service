@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document, Types } from 'mongoose'
 import { hashPassword, JwtUtils } from '../utils'
 import { IRefreshToken, RefreshToken } from './RefreshToken'
-import { IJwtPayload } from '@payhasly-discount/common'
+import { IJwtPayload, sendMessage } from '@payhasly-discount/common'
 // Create an interface representing a document in MongoDB.
 export interface IUser {
     phone: string
@@ -46,12 +46,12 @@ export const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     },
     {
         timestamps: true,
-        versionKey: false,
         toJSON: {
             transform(doc, ret) {
                 ret.id = ret._id
                 delete ret._id
                 delete ret.password
+                delete ret.__v
             }
         }
     }
@@ -76,8 +76,34 @@ userSchema.methods.getRefreshToken = async function () {
 }
 
 // Middlewares
-userSchema.pre<IUser>('save', async function (next) {
+userSchema.pre('save', async function (next) {
     this.password = await hashPassword(this.password)
+    next()
+})
+
+userSchema.post('save', async function (doc, next) {
+    const userToSend = {
+        id: doc._id,
+        phone: doc.phone,
+        isAdmin: doc.isAdmin
+    }
+    await sendMessage('AMQP_URL', JSON.stringify(userToSend), 'createUser')
+    next()
+})
+
+userSchema.post('updateOne', async function (doc, next) {
+    const userToSend = {
+        id: doc._id,
+        phone: doc.phone,
+        isAdmin: doc.isAdmin
+    }
+    console.log(userToSend)
+    await sendMessage('AMQP_URL', JSON.stringify(userToSend), 'updateUser')
+    next()
+})
+
+userSchema.post('findOneAndDelete', async function (doc, next) {
+    await sendMessage('AMQP_URL', doc._id, 'deleteUser')
     next()
 })
 
