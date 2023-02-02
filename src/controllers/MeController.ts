@@ -2,7 +2,7 @@ import { bodyValidator, controller, get, del, put, use } from './decorators'
 import { Request, Response } from 'express'
 import { User } from '../models'
 import { UserUpdateDto } from '../models/dto'
-import { authHandler, Tokens } from '@payhasly-discount/common'
+import { authHandler, Tokens, sendMessage } from '@payhasly-discount/common'
 
 @controller('')
 class MeController {
@@ -31,6 +31,12 @@ class MeController {
             return res.status(404).send({
                 errors: `User with id number ${id} is no longer available`
             })
+
+        await sendMessage(
+            'AMQP_URL',
+            JSON.stringify({ id, ...req.body }),
+            'updateUser'
+        )
 
         await user.updateOne(req.body)
 

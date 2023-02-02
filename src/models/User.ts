@@ -91,17 +91,6 @@ userSchema.post('save', async function (doc, next) {
     next()
 })
 
-userSchema.post('updateOne', async function (doc, next) {
-    const userToSend = {
-        id: doc._id,
-        phone: doc.phone,
-        isAdmin: doc.isAdmin
-    }
-    console.log(userToSend)
-    await sendMessage('AMQP_URL', JSON.stringify(userToSend), 'updateUser')
-    next()
-})
-
 userSchema.post('findOneAndDelete', async function (doc, next) {
     await sendMessage('AMQP_URL', doc._id, 'deleteUser')
     next()
