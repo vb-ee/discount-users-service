@@ -78,25 +78,20 @@ class UserController {
     @bodyValidator(UserUpdateDto)
     async updateUser(req: Request, res: Response) {
         const { userId } = req.params
-        const { phone, email, isAdmin, password } = req.body
 
-        const user = await User.findByIdAndUpdate(
-            userId,
-            {
-                $set: {
-                    phone,
-                    email,
-                    isAdmin,
-                    password
-                }
-            },
-            { new: true }
-        )
+        const user = await User.findById(userId)
         if (!user)
             return res.status(404).send({
                 errors: `User with id '${userId}' not found`
             })
-        res.status(204).json(user)
+
+        await user.updateOne(
+            {
+                $set: req.body
+            },
+            { new: true }
+        )
+        res.status(204).json({ id: user._id, ...req.body })
     }
 
     @del('/:userId')

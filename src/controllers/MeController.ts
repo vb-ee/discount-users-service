@@ -9,12 +9,12 @@ class MeController {
     @use([authHandler(Tokens.accessToken, 'JWT_ACCESS')])
     @get('me')
     async getMe(req: Request, res: Response) {
-        const { phone } = req.payload
+        const { id } = req.payload
 
-        const user = await User.findOne({ phone })
+        const user = await User.findById(id)
         if (!user)
             return res.status(404).send({
-                errors: `User with phone number ${phone} is no longer available`
+                errors: `User with id number ${id} is no longer available`
             })
 
         return res.status(200).json(user)
@@ -24,26 +24,28 @@ class MeController {
     @put('me')
     @bodyValidator(UserUpdateDto)
     async udpateMe(req: Request, res: Response) {
-        const { phone } = req.payload
+        const { id } = req.payload
 
-        const user = await User.findOneAndUpdate({ phone }, req.body)
+        const user = await User.findById(id)
         if (!user)
             return res.status(404).send({
-                errors: `User with phone number ${phone} is no longer available`
+                errors: `User with id number ${id} is no longer available`
             })
 
-        return res.status(200).json(user)
+        await user.updateOne(req.body)
+
+        return res.status(200).json({ id: user._id, ...req.body })
     }
 
     @use([authHandler(Tokens.accessToken, 'JWT_ACCESS')])
     @del('me')
     async deleteMe(req: Request, res: Response) {
-        const { phone } = req.payload
+        const { id } = req.payload
 
-        const user = await User.findOneAndDelete({ phone })
+        const user = await User.findByIdAndDelete(id)
         if (!user)
             return res.status(404).send({
-                errors: `User with phone number ${phone} is no longer available`
+                errors: `User with id number ${id} is no longer available`
             })
 
         return res.status(204).end()

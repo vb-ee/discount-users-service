@@ -15,7 +15,7 @@ export const validateBody = (dtoClass: any): RequestHandler => {
         const bodyToValidate = plainToInstance(dtoClass, req.body, {
             excludeExtraneousValues: true
         })
-        console.log(bodyToValidate)
+
         // validating
         validate(bodyToValidate, {
             forbidNonWhitelisted: true,
