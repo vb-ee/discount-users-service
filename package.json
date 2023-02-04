@@ -15,7 +15,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "@payhasly-discount/common": "^2.3.5",
+        "@payhasly-discount/common": "^2.3.7",
         "axios": "^0.27.2",
         "bcrypt": "^5.0.1",
         "class-transformer": "^0.5.1",

@@ -32,12 +32,6 @@ class MeController {
                 errors: `User with id number ${id} is no longer available`
             })
 
-        await sendMessage(
-            'AMQP_URL',
-            JSON.stringify({ id, ...req.body }),
-            'updateUser'
-        )
-
         await user.updateOne(req.body)
 
         return res.status(200).json({ id: user._id, ...req.body })

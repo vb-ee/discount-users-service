@@ -87,12 +87,33 @@ userSchema.post('save', async function (doc, next) {
         phone: doc.phone,
         isAdmin: doc.isAdmin
     }
-    await sendMessage('AMQP_URL', JSON.stringify(userToSend), 'createUser')
+    await sendMessage(
+        'AMQP_URL',
+        JSON.stringify(userToSend),
+        'createUserProfile'
+    )
+    await sendMessage(
+        'AMQP_URL',
+        userToSend.id.toString(),
+        'createUserFavorite'
+    )
+    next()
+})
+
+userSchema.post('updateOne', async function (doc, next) {
+    const { isAdmin, phone } = this.toJSON()
+    await sendMessage(
+        'AMQP_URL',
+        JSON.stringify({ id: this._id, phone, isAdmin }),
+        'updateUser'
+    )
     next()
 })
 
 userSchema.post('findOneAndDelete', async function (doc, next) {
-    await sendMessage('AMQP_URL', doc._id, 'deleteUser')
+    const id = doc._id.toString()
+    await sendMessage('AMQP_URL', id, 'deleteUserProfile')
+    await sendMessage('AMQP_URL', id, 'deleteUserFavorite')
     next()
 })
 
